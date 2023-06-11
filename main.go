@@ -108,12 +108,12 @@ type Handler struct {
 func (h *Handler) InitPlayerHandler(c *gin.Context) {
 	var req RegisterPlayerRequest
 	if err := c.Bind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "invalid json"})
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 		return
 	}
 	id, err := h.Game.genPlayerID()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "max players reached"})
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 		return
 	}
 	player := &Player{
@@ -137,7 +137,7 @@ func (h *Handler) InitPlayerHandler(c *gin.Context) {
 func (h *Handler) GroupHandler(c *gin.Context) {
 	var req GetGroupRequest
 	if err := c.Bind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "invalid json"})
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 		return
 	}
 
@@ -161,7 +161,10 @@ func main() {
 			Map:     Map{},
 		},
 	}
+	// Group handler returns group_id of player
 	r.GET("/group", h.GroupHandler)
+	// init player adds player to a new game
+	// it take player_id and returns random coord (x, y)
 	r.POST("/init/player", h.InitPlayerHandler)
 	r.Run("localhost:8080")
 }
