@@ -106,11 +106,6 @@ type Handler struct {
 }
 
 func (h *Handler) InitPlayerHandler(c *gin.Context) {
-	var req RegisterPlayerRequest
-	if err := c.Bind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
-		return
-	}
 	id, err := h.Game.genPlayerID()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
@@ -129,8 +124,9 @@ func (h *Handler) InitPlayerHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"X": player.X,
-		"Y": player.Y,
+		"playerId": id,
+		"X":        player.X,
+		"Y":        player.Y,
 	})
 }
 
@@ -165,6 +161,6 @@ func main() {
 	r.GET("/group", h.GroupHandler)
 	// init player adds player to a new game
 	// it take player_id and returns random coord (x, y)
-	r.POST("/init/player", h.InitPlayerHandler)
+	r.GET("/init/player", h.InitPlayerHandler)
 	r.Run("localhost:8080")
 }
